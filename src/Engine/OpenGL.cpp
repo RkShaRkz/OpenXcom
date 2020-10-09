@@ -10,12 +10,11 @@
 
 #ifndef __NO_OPENGL
 
+#include "OpenGL.h"
 #include <SDL.h>
-#include <SDL_opengl.h>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
-#include "OpenGL.h"
 #include "Logger.h"
 #include "Surface.h"
 
@@ -253,7 +252,7 @@ bool OpenGL::set_shader(const char *source_yaml_filename)
 		glprogram = 0;
 	}
 
-	if (source_yaml_filename && strlen(source_yaml_filename))
+	if (source_yaml_filename && source_yaml_filename[0] != '\0')
 	{
 		glprogram = glCreateProgram();
 		if (glprogram == 0)
@@ -424,20 +423,20 @@ void OpenGL::init(int w, int h)
 	glUniform1i = (PFNGLUNIFORM1IPROC)glGetProcAddress("glUniform1i");
 	glUniform2fv = (PFNGLUNIFORM2FVPROC)glGetProcAddress("glUniform2fv");
 	glUniform4fv = (PFNGLUNIFORM4FVPROC)glGetProcAddress("glUniform4fv");
-#endif
-	glXGetCurrentDisplay = (void* (APIENTRYP)())glGetProcAddress("glXGetCurrentDisplay");
-	glXGetCurrentDrawable = (Uint32 (APIENTRYP)())glGetProcAddress("glXGetCurrentDrawable");
-	glXSwapIntervalEXT = (void (APIENTRYP)(void*, Uint32, int))glGetProcAddress("glXSwapIntervalEXT");
-
-	wglSwapIntervalEXT = (Uint32 (APIENTRYP)(int))glGetProcAddress("wglSwapIntervalEXT");
-
-
 
 	shader_support = glCreateProgram && glDeleteProgram && glUseProgram && glCreateShader
 	&& glDeleteShader && glShaderSource && glCompileShader && glAttachShader
 	&& glDetachShader && glLinkProgram && glGetUniformLocation && glIsProgram && glIsShader
 	&& glUniform1i && glUniform2fv && glUniform4fv && glGetAttachedShaders
 	&& glGetShaderiv && glGetShaderInfoLog && glGetProgramiv && glGetProgramInfoLog;
+#else
+	shader_support = true;
+#endif
+	glXGetCurrentDisplay = (void* (APIENTRYP)())glGetProcAddress("glXGetCurrentDisplay");
+	glXGetCurrentDrawable = (Uint32 (APIENTRYP)())glGetProcAddress("glXGetCurrentDrawable");
+	glXSwapIntervalEXT = (void (APIENTRYP)(void*, Uint32, int))glGetProcAddress("glXSwapIntervalEXT");
+
+	wglSwapIntervalEXT = (Uint32 (APIENTRYP)(int))glGetProcAddress("wglSwapIntervalEXT");
 
 	if (shader_support)
 	{
@@ -501,7 +500,7 @@ void OpenGL::term()
 	delete buffer_surface;
 }
 
-  OpenGL::OpenGL() : gltexture(0), glprogram(0), linear(false),
+  OpenGL::OpenGL() : gltexture(0), glprogram(0), linear(false), shader_support(false),
                      buffer(NULL), buffer_surface(NULL), iwidth(0), iheight(0),
                      iformat(GL_UNSIGNED_INT_8_8_8_8_REV), // this didn't seem to be set anywhere before...
                      ibpp(32)                              // ...nor this

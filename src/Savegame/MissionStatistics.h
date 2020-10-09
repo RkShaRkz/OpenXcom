@@ -1,3 +1,4 @@
+#pragma once
 /*
 * Copyright 2010-2016 OpenXcom Developers.
 *
@@ -22,6 +23,7 @@
 #include <sstream>
 #include "GameTime.h"
 #include "../Engine/Language.h"
+#include "../Battlescape/TileEngine.h"
 
 namespace OpenXcom
 {
@@ -93,7 +95,7 @@ struct MissionStatistics
 		return node;
 	}
 
-	std::wstring getMissionName(Language *lang) const
+	std::string getMissionName(Language *lang) const
 	{
 		if (!markerName.empty())
 		{
@@ -105,9 +107,9 @@ struct MissionStatistics
 		}
 	}
 
-	std::wstring getRatingString(Language *lang) const
+	std::string getRatingString(Language *lang) const
 	{
-		std::wostringstream ss;
+		std::ostringstream ss;
 		if (success)
 		{
 			ss << lang->getString("STR_VICTORY");
@@ -116,7 +118,7 @@ struct MissionStatistics
 		{
 			ss << lang->getString("STR_DEFEAT");
 		}
-		ss << L" - " << lang->getString(rating);
+		ss << " - " << lang->getString(rating);
 		return ss.str();
 	}
 
@@ -132,15 +134,20 @@ struct MissionStatistics
 		}
 	}
 
+	bool isDarkness() const
+	{
+		return daylight > TileEngine::MAX_DARKNESS_TO_SEE_UNITS;
+	}
+
 	std::string getDaylightString() const
 	{
-		if (daylight <= 5)
+		if (isDarkness())
 		{
-			return "STR_DAY";
+			return "STR_NIGHT";
 		}
 		else
 		{
-			return "STR_NIGHT";
+			return "STR_DAY";
 		}
 	}
 

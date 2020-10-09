@@ -1,3 +1,4 @@
+#pragma once
 /*
 * Copyright 2010-2016 OpenXcom Developers.
 *
@@ -31,7 +32,7 @@ namespace OpenXcom
 struct BattleUnitKills
 {
 	// Variables
-	std::wstring name;
+	std::string name;
 	std::string type, rank, race, weapon, weaponAmmo;
 	UnitFaction faction;
 	UnitStatus status;
@@ -64,7 +65,7 @@ struct BattleUnitKills
 	{
 		if (const YAML::Node n = node["name"])
 		{
-			name = Language::utf8ToWstr(n.as<std::string>());
+			name = n.as<std::string>();
 		}
 		type = node["type"].as<std::string>(type);
 		rank = node["rank"].as<std::string>(rank);
@@ -85,7 +86,7 @@ struct BattleUnitKills
 	{
 		YAML::Node node;
 		if (!name.empty())
-			node["name"] = Language::wstrToUtf8(name);
+			node["name"] = name;
 		if (!type.empty())
 			node["type"] = type;
 		node["rank"] = rank;
@@ -170,7 +171,7 @@ struct BattleUnitKills
 	}
 
 	/// Get human-readable victim name.
-	std::wstring getUnitName(Language *lang) const
+	std::string getUnitName(Language *lang) const
 	{
 		if (!name.empty())
 		{
@@ -182,8 +183,8 @@ struct BattleUnitKills
 		}
 		else
 		{
-			std::wostringstream ss;
-			ss << lang->getString(race) << L" " << lang->getString(rank);
+			std::ostringstream ss;
+			ss << lang->getString(race) << " " << lang->getString(rank);
 			return ss.str();
 		}
 	}
@@ -191,7 +192,7 @@ struct BattleUnitKills
 	/// Decide victim name, race and rank.
 	void setUnitStats(BattleUnit *unit)
 	{
-		name = L"";
+		name = "";
 		type = "";
 		if (unit->getGeoscapeSoldier())
 		{
@@ -318,13 +319,15 @@ struct BattleUnitStatistics
 	std::vector<BattleUnitKills*> kills; ///< Tracks kills
 	int daysWounded;                     ///< Tracks how many days the unit was wounded for
 	bool KIA;                            ///< Tracks if the soldier was killed in battle
-	bool nikeCross;                      ///< Tracks if a soldier killed every alien
+	bool nikeCross;                      ///< Tracks if a soldier killed every alien or killed and stunned every alien
 	bool mercyCross;                     ///< Tracks if a soldier stunned every alien
 	int woundsHealed;                    ///< Tracks how many times a fatal wound was healed by this unit
 	UnitStats delta;                     ///< Tracks the increase in unit stats (is not saved, only used during debriefing)
 	int appliedStimulant;                ///< Tracks how many times this soldier applied stimulant
 	int appliedPainKill;                 ///< Tracks how many times this soldier applied pain killers
-	int revivedSoldier;                  ///< Tracks how many times this soldier revived another unit
+	int revivedSoldier;                  ///< Tracks how many times this soldier revived another soldier
+	int revivedHostile;                  ///< Tracks how many times this soldier revived another hostile
+	int revivedNeutral;                  ///< Tracks how many times this soldier revived another civilian
 	bool MIA;                            ///< Tracks if the soldier was left behind :(
 	int martyr;                          ///< Tracks how many kills the soldier landed on the turn of his death
 	int slaveKills;                      ///< Tracks how many kills the soldier landed thanks to a mind controlled unit.
@@ -379,6 +382,8 @@ struct BattleUnitStatistics
 		appliedStimulant = node["appliedStimulant"].as<int>(appliedStimulant);
 		appliedPainKill = node["appliedPainKill"].as<int>(appliedPainKill);
 		revivedSoldier = node["revivedSoldier"].as<int>(revivedSoldier);
+		revivedHostile = node["revivedHostile"].as<int>(revivedHostile);
+		revivedNeutral = node["revivedNeutral"].as<int>(revivedNeutral);
 		martyr = node["martyr"].as<int>(martyr);
 		slaveKills = node["slaveKills"].as<int>(slaveKills);
 	}
@@ -409,13 +414,15 @@ struct BattleUnitStatistics
 		if (appliedStimulant) node["appliedStimulant"] = appliedStimulant;
 		if (appliedPainKill) node["appliedPainKill"] = appliedPainKill;
 		if (revivedSoldier) node["revivedSoldier"] = revivedSoldier;
+		if (revivedHostile) node["revivedHostile"] = revivedHostile;
+		if (revivedNeutral) node["revivedNeutral"] = revivedNeutral;
 		if (martyr) node["martyr"] = martyr;
 		if (slaveKills) node["slaveKills"] = slaveKills;
 		return node;
 	}
 
 	BattleUnitStatistics(const YAML::Node& node) { load(node); }
-	BattleUnitStatistics() : wasUnconcious(false), shotAtCounter(0), hitCounter(0), shotByFriendlyCounter(0), shotFriendlyCounter(0), loneSurvivor(false), ironMan(false), longDistanceHitCounter(0), lowAccuracyHitCounter(0), shotsFiredCounter(0), shotsLandedCounter(0), kills(), daysWounded(0), KIA(false), nikeCross(false), mercyCross(false), woundsHealed(0), appliedStimulant(0), appliedPainKill(0), revivedSoldier(0), MIA(false), martyr(0), slaveKills(0) { }
+	BattleUnitStatistics() : wasUnconcious(false), shotAtCounter(0), hitCounter(0), shotByFriendlyCounter(0), shotFriendlyCounter(0), loneSurvivor(false), ironMan(false), longDistanceHitCounter(0), lowAccuracyHitCounter(0), shotsFiredCounter(0), shotsLandedCounter(0), kills(), daysWounded(0), KIA(false), nikeCross(false), mercyCross(false), woundsHealed(0), appliedStimulant(0), appliedPainKill(0), revivedSoldier(0), revivedHostile(0), revivedNeutral(0), MIA(false), martyr(0), slaveKills(0) { }
 	~BattleUnitStatistics() { }
 };
 

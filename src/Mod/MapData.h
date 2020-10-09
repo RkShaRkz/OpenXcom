@@ -63,6 +63,7 @@ private:
 	int _loftID[12];
 	unsigned short _miniMapIndex;
 public:
+	static const int O_DUMMY = 999;
 	MapData(MapDataSet *dataset);
 	~MapData();
 	/// Gets the dataset this object belongs to.
@@ -113,7 +114,7 @@ public:
 	int getFootstepSound() const;
 	/// Sets the index to the footstep sound.
 	void setFootstepSound(int value);
-	/// Gets sthe alternative object ID.
+	/// Gets the alternative object ID.
 	int getAltMCD() const;
 	/// Sets the alternative object ID.
 	void setAltMCD(int value);

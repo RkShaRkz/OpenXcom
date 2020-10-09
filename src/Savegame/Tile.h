@@ -53,7 +53,7 @@ public:
 		Uint8 boolFields;
 		Uint32 totalBytes; // per structure, including any data not mentioned here and accounting for all array members!
 	} serializationKey;
-	
+
 	static const int NOT_CALCULATED = -1;
 
 protected:
@@ -79,6 +79,7 @@ protected:
 	int _overlaps;
 	bool _danger;
 	std::list<Particle*> _particles;
+	int _obstacle;
 public:
 	/// Creates a tile.
 	Tile(Position pos);
@@ -130,7 +131,7 @@ public:
 	/// Gets the floor object footstep sound.
 	int getFootstepSound(Tile *tileBelow) const;
 	/// Open a door, returns the ID, 0(normal), 1(ufo) or -1 if no door opened.
-	int openDoor(TilePart part, BattleUnit *Unit = 0, BattleActionType reserve = BA_NONE);
+	int openDoor(TilePart part, BattleUnit *unit = 0, BattleActionType reserve = BA_NONE);
 
 	/**
 	 * Check if the ufo door is open or opening. Used for visibility/light blocking checks.
@@ -241,6 +242,20 @@ public:
 	/// gets a pointer to this tile's particle array.
 	std::list<Particle *> *getParticleCloud();
 
+	/// sets single obstacle flag.
+	void setObstacle(int part);
+	/// gets single obstacle flag.
+	bool getObstacle(int part) const
+	{
+		return _obstacle & (1 << part);
+	}
+	/// does the tile have obstacle flag set for at least one part?
+	bool isObstacle(void) const
+	{
+		return _obstacle != 0;
+	}
+	/// reset obstacle flags
+	void resetObstacle(void);
 };
 
 }
